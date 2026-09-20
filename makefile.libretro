@@ -13,116 +13,113 @@ CMAKEFLAGS_EXTRA ?=
 ANDROID_NDK_LLVM ?= $(NDK_ROOT)/toolchains/llvm/prebuilt/linux-x86_64
 ANDROID_API ?= 21
 
-ifeq ($(platform),win64)                        # windows-x64-mingw
-	CMAKEFLAGS_EXTRA := -DCMAKE_SYSTEM_NAME=Windows
-	MAKE_EXTRA := SO_SUFFIX=.dll
+ifeq ($(platform),win64)                     # windows-x64-mingw
+    CMAKEFLAGS_EXTRA := -DCMAKE_SYSTEM_NAME=Windows
+    MAKE_EXTRA := SO_SUFFIX=.dll
 else ifeq ($(platform),win32)                   # windows-i686-mingw
-	CMAKEFLAGS_EXTRA := -DCMAKE_SYSTEM_NAME=Windows
-	MAKE_EXTRA := SO_SUFFIX=.dll
+    CMAKEFLAGS_EXTRA := -DCMAKE_SYSTEM_NAME=Windows
+    MAKE_EXTRA := SO_SUFFIX=.dll
 else ifeq ($(platform),unix)
-ifneq ($(ARCH),x86)                             # linux-x64, linux-aarch64
-else                                            # linux-i686
+ifneq ($(ARCH),x86)                            # linux-x64, linux-aarch64
+else                                           # linux-i686
 endif
 else ifeq ($(platform),osx)
-ifneq ($(ARCH),arm)                             # osx-x64
-else                                            # osx-arm64
+ifneq ($(ARCH),arm)                            # osx-x64
+else                                           # osx-arm64
 endif
 else ifeq ($(ANDROID_PLATFORM),android-arm)     # android-make: android-arm
-	CMAKEFLAGS_EXTRA := -DCMAKE_TOOLCHAIN_FILE=$(NDK_ROOT)/build/cmake/android.toolchain.cmake \
-		-DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-$(ANDROID_API)
-	MAKE_EXTRA := CC="$(ANDROID_NDK_LLVM)/bin/clang --target=armv7a-linux-androideabi$(ANDROID_API)" \
-		AR=$(ANDROID_NDK_LLVM)/bin/llvm-ar \
-		RANLIB=$(ANDROID_NDK_LLVM)/bin/llvm-ranlib
-	COREFILE := $(CORENAME)_libretro_android
+    CMAKEFLAGS_EXTRA := -DCMAKE_TOOLCHAIN_FILE=$(NDK_ROOT)/build/cmake/android.toolchain.cmake \
+        -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-$(ANDROID_API)
+    MAKE_EXTRA := CC="$(ANDROID_NDK_LLVM)/bin/clang --target=armv7a-linux-androideabi$(ANDROID_API)" \
+        AR=$(ANDROID_NDK_LLVM)/bin/llvm-ar \
+        RANLIB=$(ANDROID_NDK_LLVM)/bin/llvm-ranlib
+    COREFILE := $(CORENAME)_libretro_android
 else ifeq ($(ANDROID_PLATFORM),android-arm64)   # android-make: android-arm64
-	CMAKEFLAGS_EXTRA := -DCMAKE_TOOLCHAIN_FILE=$(NDK_ROOT)/build/cmake/android.toolchain.cmake \
-		-DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-$(ANDROID_API)
-	MAKE_EXTRA := CC="$(ANDROID_NDK_LLVM)/bin/clang --target=aarch64-linux-android$(ANDROID_API)" \
-		AR=$(ANDROID_NDK_LLVM)/bin/llvm-ar \
-		RANLIB=$(ANDROID_NDK_LLVM)/bin/llvm-ranlib
-	COREFILE := $(CORENAME)_libretro_android
+    CMAKEFLAGS_EXTRA := -DCMAKE_TOOLCHAIN_FILE=$(NDK_ROOT)/build/cmake/android.toolchain.cmake \
+        -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-$(ANDROID_API)
+    MAKE_EXTRA := CC="$(ANDROID_NDK_LLVM)/bin/clang --target=aarch64-linux-android$(ANDROID_API)" \
+        AR=$(ANDROID_NDK_LLVM)/bin/llvm-ar \
+        RANLIB=$(ANDROID_NDK_LLVM)/bin/llvm-ranlib
+    COREFILE := $(CORENAME)_libretro_android
 else ifeq ($(ANDROID_PLATFORM),android-x86)     # android-make: android-x86
-	CMAKEFLAGS_EXTRA := -DCMAKE_TOOLCHAIN_FILE=$(NDK_ROOT)/build/cmake/android.toolchain.cmake \
-		-DANDROID_ABI=x86 -DANDROID_PLATFORM=android-$(ANDROID_API)
-	MAKE_EXTRA := CC="$(ANDROID_NDK_LLVM)/bin/clang --target=i686-linux-android$(ANDROID_API)" \
-		AR=$(ANDROID_NDK_LLVM)/bin/llvm-ar \
-		RANLIB=$(ANDROID_NDK_LLVM)/bin/llvm-ranlib
-	COREFILE := $(CORENAME)_libretro_android
+    CMAKEFLAGS_EXTRA := -DCMAKE_TOOLCHAIN_FILE=$(NDK_ROOT)/build/cmake/android.toolchain.cmake \
+        -DANDROID_ABI=x86 -DANDROID_PLATFORM=android-$(ANDROID_API)
+    MAKE_EXTRA := CC="$(ANDROID_NDK_LLVM)/bin/clang --target=i686-linux-android$(ANDROID_API)" \
+        AR=$(ANDROID_NDK_LLVM)/bin/llvm-ar \
+        RANLIB=$(ANDROID_NDK_LLVM)/bin/llvm-ranlib
+    COREFILE := $(CORENAME)_libretro_android
 else ifeq ($(ANDROID_PLATFORM),android-x86_64)  # android-make: android-x86_64
-	CMAKEFLAGS_EXTRA := -DCMAKE_TOOLCHAIN_FILE=$(NDK_ROOT)/build/cmake/android.toolchain.cmake \
-		-DANDROID_ABI=x86_64 -DANDROID_PLATFORM=android-$(ANDROID_API)
-	MAKE_EXTRA := CC="$(ANDROID_NDK_LLVM)/bin/clang --target=x86_64-linux-android$(ANDROID_API)" \
-		AR=$(ANDROID_NDK_LLVM)/bin/llvm-ar \
-		RANLIB=$(ANDROID_NDK_LLVM)/bin/llvm-ranlib
-	COREFILE := $(CORENAME)_libretro_android
+    CMAKEFLAGS_EXTRA := -DCMAKE_TOOLCHAIN_FILE=$(NDK_ROOT)/build/cmake/android.toolchain.cmake \
+        -DANDROID_ABI=x86_64 -DANDROID_PLATFORM=android-$(ANDROID_API)
+    MAKE_EXTRA := CC="$(ANDROID_NDK_LLVM)/bin/clang --target=x86_64-linux-android$(ANDROID_API)" \
+        AR=$(ANDROID_NDK_LLVM)/bin/llvm-ar \
+        RANLIB=$(ANDROID_NDK_LLVM)/bin/llvm-ranlib
+    COREFILE := $(CORENAME)_libretro_android
 else ifeq ($(platform),ios-arm64)               # ios-arm64
-	COREFILE := $(CORENAME)_libretro_ios
+    COREFILE := $(CORENAME)_libretro_ios
 else ifeq ($(platform),ios9)                    # ios9
-	COREFILE := $(CORENAME)_libretro_ios
+    COREFILE := $(CORENAME)_libretro_ios
 else ifeq ($(platform),tvos-arm64)              # tvos-arm64
-	COREFILE := $(CORENAME)_libretro_tvos
+    COREFILE := $(CORENAME)_libretro_tvos
 else ifeq ($(platform),vita)                    # vita-static
-	CMAKEFLAGS_EXTRA := -DCMAKE_TOOLCHAIN_FILE=$(VITASDK)/share/vita.toolchain.cmake \
-		-DCMAKE_POSITION_INDEPENDENT_CODE=OFF
-	# readcpu.c opcstr[pos] (-Wno-char-subscripts)
-	CFLAGS_EXTRA := -Wno-char-subscripts
-	MAKE_EXTRA := CC="$(VITASDK)/bin/arm-vita-eabi-gcc" \
-		AR="$(VITASDK)/bin/arm-vita-eabi-ar" \
-		RANLIB="$(VITASDK)/bin/arm-vita-eabi-ranlib" \
-		FPIC_FLAG=""
-	MAKE_ACTION := static
-	ZLIB_MAKE_ACTION := manual
+    CMAKEFLAGS_EXTRA := -DCMAKE_TOOLCHAIN_FILE=$(VITASDK)/share/vita.toolchain.cmake \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=OFF
+    # readcpu.c opcstr[pos] (-Wno-char-subscripts)
+    CFLAGS_EXTRA := -Wno-char-subscripts
+    MAKE_EXTRA := CC="$(VITASDK)/bin/arm-vita-eabi-gcc" \
+        AR="$(VITASDK)/bin/arm-vita-eabi-ar" \
+        RANLIB="$(VITASDK)/bin/arm-vita-eabi-ranlib" \
+        FPIC_FLAG=""
+    MAKE_ACTION := static
+    ZLIB_MAKE_ACTION := manual
 else ifeq ($(platform),wii)                     # wii-static
-	CMAKEFLAGS_EXTRA := -DCMAKE_TOOLCHAIN_FILE=$(DEVKITPRO)/wii.cmake \
-		-DCMAKE_POSITION_INDEPENDENT_CODE=OFF
-	# readcpu.c opcstr[pos] (-Wno-char-subscripts)
-	# fenv.h seems to lack rounding defines FE_TONEAREST, etc. used in fpp_native.c (-D__LIBRETRO__NO_HOST_ROUNDING)
-	CFLAGS_EXTRA := -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float \
-		-D__LIBRETRO__NO_HOST_ROUNDING \
-		-Wno-char-subscripts
-	MAKE_EXTRA := CC="powerpc-eabi-gcc" \
-		AR="powerpc-eabi-ar" \
-		RANLIB="powerpc-eabi-ranlib" \
-		FPIC_FLAG=""
-	MAKE_ACTION := static
-	ZLIB_MAKE_ACTION := manual
-# PS2
-ifeq ($(platform), ps2)
-    TARGET := hatarib_libretro_ps2.a
-    CC = mips64r5900el-ps2-elf-gcc
-    CXX = mips64r5900el-ps2-elf-g++
-    AR = mips64r5900el-ps2-elf-ar
-    CFLAGS += -Os -march=r5900 -mtune=r5900 -G0 -ffast-math -fomit-frame-pointer -DPS2 -DABGR1555 -fno-expensive-optimizations -fcommon
-    CXXFLAGS += -Os -march=r5900 -mtune=r5900 -G0 -ffast-math -fomit-frame-pointer -DPS2 -DABGR1555 -fno-expensive-optimizations -fcommon
-    LDFLAGS += -Wl,--allow-multiple-definition
-    STATIC_LINKING = 1
-    STATIC_LINKING_LINK = 1
-    # Ensure it skips building shared libraries (.so) and handles static build rules
-    HAVE_DYNREC = 0
+    CMAKEFLAGS_EXTRA := -DCMAKE_TOOLCHAIN_FILE=$(DEVKITPRO)/wii.cmake \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=OFF
+    # readcpu.c opcstr[pos] (-Wno-char-subscripts)
+    # fenv.h seems to lack rounding defines FE_TONEAREST, etc. used in fpp_native.c (-D__LIBRETRO__NO_HOST_ROUNDING)
+    CFLAGS_EXTRA := -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float \
+        -D__LIBRETRO__NO_HOST_ROUNDING \
+        -Wno-char-subscripts
+    MAKE_EXTRA := CC="powerpc-eabi-gcc" \
+        AR="powerpc-eabi-ar" \
+        RANLIB="powerpc-eabi-ranlib" \
+        FPIC_FLAG=""
+    MAKE_ACTION := static
+    ZLIB_MAKE_ACTION := manual
+else ifeq ($(platform),ps2)                     # ps2-static
+    CMAKEFLAGS_EXTRA := -DCMAKE_POSITION_INDEPENDENT_CODE=OFF
+    CFLAGS_EXTRA := -Os -march=r5900 -mtune=r5900 -G0 -ffast-math -fomit-frame-pointer -DPS2 -DABGR1555 -fno-expensive-optimizations -fcommon
+    MAKE_EXTRA := CC="mips64r5900el-ps2-elf-gcc" \
+        CXX="mips64r5900el-ps2-elf-g++" \
+        AR="mips64r5900el-ps2-elf-ar" \
+        RANLIB="mips64r5900el-ps2-elf-ranlib" \
+        FPIC_FLAG=""
+    MAKE_ACTION := static
+    ZLIB_MAKE_ACTION := manual
 else ifeq ($(platform),wiiu)                    # wiiu-static
-	# libretro WiiU does not appear to have a toolchain file, settings from libretro-wiiu-static-cmake
-	CMAKEFLAGS_EXTRA :=  -DCMAKE_SYSTEM_PROCESSOR=powerpc -DCMAKE_SYSTEM_NAME=Generic \
-		-DCMAKE_CROSSCOMPILING=ON -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
-		-DCMAKE_POSITION_INDEPENDENT_CODE=OFF
-	# readcpu.c opcstr[pos] (-Wno-char-subscripts)
-	CFLAGS_EXTRA := -mcpu=750 -meabi -mhard-float \
-		-Wno-char-subscripts
-	MAKE_EXTRA := CC="${DEVKITPPC}/bin/powerpc-eabi-gcc" \
-		AR="${DEVKITPPC}/bin/powerpc-eabi-ar" \
-		RANLIB="${DEVKITPPC}/bin/powerpc-eabi-ranlib" \
-		FPIC_FLAG=""
-	MAKE_ACTION := static
-	ZLIB_MAKE_ACTION := manual
+    # libretro WiiU does not appear to have a toolchain file, settings from libretro-wiiu-static-cmake
+    CMAKEFLAGS_EXTRA :=  -DCMAKE_SYSTEM_PROCESSOR=powerpc -DCMAKE_SYSTEM_NAME=Generic \
+        -DCMAKE_CROSSCOMPILING=ON -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=OFF
+    # readcpu.c opcstr[pos] (-Wno-char-subscripts)
+    CFLAGS_EXTRA := -mcpu=750 -meabi -mhard-float \
+        -Wno-char-subscripts
+    MAKE_EXTRA := CC="${DEVKITPPC}/bin/powerpc-eabi-gcc" \
+        AR="${DEVKITPPC}/bin/powerpc-eabi-ar" \
+        RANLIB="${DEVKITPPC}/bin/powerpc-eabi-ranlib" \
+        FPIC_FLAG=""
+    MAKE_ACTION := static
+    ZLIB_MAKE_ACTION := manual
 else ifeq ($(platform),libnx)                   # libnx-static
-	CMAKEFLAGS_EXTRA := -DCMAKE_TOOLCHAIN_FILE=$(DEVKITPRO)/cmake/Switch.cmake
-	# readcpu.c opcstr[pos] (-Wno-char-subscripts)
-	CFLAGS_EXTRA := -Wno-char-subscripts
-	MAKE_EXTRA := CC="$(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-gcc" \
-		AR="$(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-ar" \
-		RANLIB="$(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-ranlib" \
-		FPIC_FLAG=-fPIE
-	MAKE_ACTION := static
-	ZLIB_MAKE_ACTION := manual
+    CMAKEFLAGS_EXTRA := -DCMAKE_TOOLCHAIN_FILE=$(DEVKITPRO)/cmake/Switch.cmake
+    # readcpu.c opcstr[pos] (-Wno-char-subscripts)
+    CFLAGS_EXTRA := -Wno-char-subscripts
+    MAKE_EXTRA := CC="$(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-gcc" \
+        AR="$(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-ar" \
+        RANLIB="$(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-ranlib" \
+        FPIC_FLAG=-fPIE
+    MAKE_ACTION := static
+    ZLIB_MAKE_ACTION := manual
 endif
 
 .PHONY: default libretro
@@ -130,17 +127,17 @@ endif
 default: libretro
 
 ZLIB_ARGS = $(ZLIB_MAKE_ACTION) \
-	$(MAKE_EXTRA) \
-	CFLAGS_EXTRA="$(CFLAGS_EXTRA)" \
-	$(ZLIB_EXTRA) \
-	ZLIB_CONFIGURE_EXTRA="$(ZLIB_CONFIGURE_EXTRA)"
+    $(MAKE_EXTRA) \
+    CFLAGS_EXTRA="$(CFLAGS_EXTRA)" \
+    $(ZLIB_EXTRA) \
+    ZLIB_CONFIGURE_EXTRA="$(ZLIB_CONFIGURE_EXTRA)"
 
 MAKE_ARGS = $(MAKE_ACTION) \
-	COREFILE=$(COREFILE) COREDIR=. CORESTATIC=$(CORESTATIC)$(CORESTATIC_SUFFIX) \
-	$(MAKE_EXTRA) \
-	CFLAGS_EXTRA="$(CFLAGS_EXTRA)" \
-	CMAKEFLAGS_EXTRA="$(CMAKEFLAGS_EXTRA)"
+    COREFILE=$(COREFILE) COREDIR=. CORESTATIC=$(CORESTATIC)$(CORESTATIC_SUFFIX) \
+    $(MAKE_EXTRA) \
+    CFLAGS_EXTRA="$(CFLAGS_EXTRA)" \
+    CMAKEFLAGS_EXTRA="$(CMAKEFLAGS_EXTRA)"
 
 libretro:
-	$(MAKE) -f makefile.zlib $(ZLIB_ARGS)
-	$(MAKE) -f makefile $(MAKE_ARGS)
+    $(MAKE) -f makefile.zlib $(ZLIB_ARGS)
+    $(MAKE) -f makefile $(MAKE_ARGS)
