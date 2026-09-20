@@ -32,13 +32,16 @@ WERROR ?= -Wall -Werror
 # git revision hash
 SHORTHASH = "$(shell git rev-parse --short HEAD || unknown)"
 
+# PS2 Platform Configuration
 ifeq ($(platform),ps2)
-CMAKEFLAGS += \
-    -DCMAKE_SYSTEM_NAME=Generic \
-    -DCMAKE_C_COMPILER=$(CC) \
-    -DCMAKE_CXX_COMPILER=$(CXX) \
-    -DCMAKE_AR=$(AR) \
-    -DCMAKE_RANLIB=mips64r5900el-ps2-elf-ranlib
+    CC = mips64r5900el-ps2-elf-gcc
+    CXX = mips64r5900el-ps2-elf-g++
+    AR = mips64r5900el-ps2-elf-ar
+    RANLIB = mips64r5900el-ps2-elf-ranlib
+    FPIC_FLAG =
+    WERROR =
+    CFLAGS_EXTRA += -Os -march=r5900 -mtune=r5900 -G0 -ffast-math -fomit-frame-pointer -DPS2 -DABGR1555 -fno-expensive-optimizations -fcommon
+    SO_SUFFIX = .a
 endif
 
 # static libraries
@@ -49,6 +52,7 @@ ZLIB_LINK ?= $(ZLIB_LIB)
 
 CC ?= gcc
 AR ?= ar
+RANLIB ?= ranlib
 CFLAGS += \
     -O3 $(WERROR) $(FPIC_FLAG) \
     -D__LIBRETRO__ -DSHORTHASH=\"$(SHORTHASH)\" \
@@ -81,7 +85,8 @@ CMAKEFLAGS += \
     -DCMAKE_SYSTEM_NAME=Generic \
     -DCMAKE_C_COMPILER=$(CC) \
     -DCMAKE_CXX_COMPILER=$(CXX) \
-    -DCMAKE_AR=$(AR)
+    -DCMAKE_AR=$(AR) \
+    -DCMAKE_RANLIB=$(RANLIB)
 endif
 
 ifeq ($(FPIC_FLAG),-fPIC)
@@ -189,7 +194,12 @@ $(BD)/core/%.o: core/%.c hatarilib
 	$(CC) -o $@ $(CFLAGS) -c $<
 
 hatarilib: directories
-	(cd hatari/$(HBD) && $(CMAKE) .. $(CMAKEFLAGS) -DCMAKE_C_FLAGS="$(CFLAGS)")
+	(cd hatari/$(HBD) && $(CMAKE) .. $(CMAKEFLAGS) \
+		-DCMAKE_C_COMPILER="$(CC)" \
+		-DCMAKE_CXX_COMPILER="$(CXX)" \
+		-DCMAKE_AR="$(AR)" \
+		-DCMAKE_RANLIB="$(RANLIB)" \
+		-DCMAKE_C_FLAGS="$(CFLAGS)")
 	(cd hatari/$(HBD) && $(CMAKE) --build . $(CMAKEBUILDFLAGS))
 
 clean:
