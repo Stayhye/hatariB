@@ -154,18 +154,18 @@ core: $(CORE)
 
 # clean and rebuild everything (including static libs)
 full:
-    $(MAKE) -f makefile.zlib clean
-    $(MAKE) clean
-    $(MAKE) -f makefile.zlib
-    $(MAKE) default
+	$(MAKE) -f makefile.zlib clean
+	$(MAKE) clean
+	$(MAKE) -f makefile.zlib
+	$(MAKE) default
 
 zlib:
-    $(MAKE) -f makefile.zlib
+	$(MAKE) -f makefile.zlib
 
 directories:
-    mkdir -p $(BD)
-    mkdir -p $(BD)/core
-    mkdir -p hatari/$(HBD)
+	mkdir -p $(BD)
+	mkdir -p $(BD)/core
+	mkdir -p hatari/$(HBD)
 
 ifeq ($(platform),ps2)
 # For PS2, build directly as a static library archive (.a) instead of linking a .so object
@@ -173,27 +173,27 @@ $(CORE): directories hatarilib $(OBJECTS)
 	$(AR) rcs $(CORE) $(OBJECTS) $(HATARILIBS) $(HATARILIBS2)
 else
 $(CORE): directories hatarilib $(OBJECTS)
-    $(CC) -o $(CORE) $(LDFLAGS) $(OBJECTS) $(HATARILIBS) $(HATARILIBS2)
+	$(CC) -o $(CORE) $(LDFLAGS) $(OBJECTS) $(HATARILIBS) $(HATARILIBS2)
 endif
 
 # static target produces a single library $(CORESTATIC) instead of a shared object
 DUMP_HATARILIBS = $(foreach a,$(HATARILIBS),DUMP_$(a))
 phony: $(DUMP_HATARILIBS) dump_directories
 dump_directories:
-    mkdir -p $(BD)/libs
+	mkdir -p $(BD)/libs
 $(DUMP_HATARILIBS): dump_directories hatarilib
-    $(AR) x $(patsubst DUMP_%,%,$@) --output $(BD)/libs
+	$(AR) x $(patsubst DUMP_%,%,$@) --output $(BD)/libs
 $(CORESTATIC): $(DUMP_HATARILIBS) $(OBJECTS)
-    $(AR) r $@ $(BD)/libs/*.* $(OBJECTS)
+	$(AR) r $@ $(BD)/libs/*.* $(OBJECTS)
 static: directories $(CORESTATIC)
 
 $(BD)/core/%.o: core/%.c hatarilib
-    $(CC) -o $@ $(CFLAGS) -c $<
+	$(CC) -o $@ $(CFLAGS) -c $<
 
 hatarilib: directories
-    (cd hatari/$(HBD) && $(CMAKE) .. $(CMAKEFLAGS) -DCMAKE_C_FLAGS="$(CFLAGS)")
-    (cd hatari/$(HBD) && $(CMAKE) --build . $(CMAKEBUILDFLAGS))
+	(cd hatari/$(HBD) && $(CMAKE) .. $(CMAKEFLAGS) -DCMAKE_C_FLAGS="$(CFLAGS)")
+	(cd hatari/$(HBD) && $(CMAKE) --build . $(CMAKEBUILDFLAGS))
 
 clean:
-    rm -f -r $(BD)
-    rm -f -r hatari/$(HBD)
+	rm -f -r $(BD)
+	rm -f -r hatari/$(HBD)
