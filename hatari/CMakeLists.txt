@@ -24,6 +24,11 @@ include(CheckCCompilerFlag)
 include(DistClean)
 include(CheckTypeSize)
 
+# Detect PlayStation 2 cross-compilation target
+if(CMAKE_SYSTEM_NAME STREQUAL "Generic" AND CMAKE_C_COMPILER MATCHES "ps2")
+	set(PS2 1)
+endif()
+
 # set(CMAKE_VERBOSE_MAKEFILE 1)
 
 find_package(PkgConfig)
@@ -73,19 +78,19 @@ set(ENABLE_TRACING 1
 #   https://github.com/google/sanitizers/wiki/AddressSanitizer
 #
 CHECK_C_COMPILER_FLAG("-fsanitize=address" ASAN_AVAILABLE)
-if(ASAN_AVAILABLE)
+if(ASAN_AVAILABLE AND NOT PS2)
 	set(ENABLE_ASAN 0
 	    CACHE BOOL "Enable GCC/LLVM run-time stack/pointer debugging (~2x slowdown)")
-endif(ASAN_AVAILABLE)
+endif(ASAN_AVAILABLE AND NOT PS2)
 
 CHECK_C_COMPILER_FLAG("-fsanitize=undefined" UBSAN_AVAILABLE)
-if(UBSAN_AVAILABLE)
+if(UBSAN_AVAILABLE AND NOT PS2)
 	set(ENABLE_UBSAN 0
 	    CACHE BOOL "Enable GCC/LLVM run-time undefined behavior debugging")
-endif(UBSAN_AVAILABLE)
+endif(UBSAN_AVAILABLE AND NOT PS2)
 
 find_program(GZIP gzip)
-if(UNIX AND GZIP)
+if(UNIX AND GZIP AND NOT PS2)
 	set(ENABLE_MAN_PAGES 1 CACHE BOOL "Built and install man pages")
 else()
 	set(ENABLE_MAN_PAGES 0 CACHE BOOL "Built and install man pages")
@@ -122,7 +127,7 @@ endif() # hatariB
 find_package(Math)
 
 find_package(Readline)
-if(Readline_FOUND)
+if(Readline_FOUND AND NOT PS2)
 	set(HAVE_LIBREADLINE 1)
 endif(Readline_FOUND)
 
@@ -133,11 +138,11 @@ if(ZLIB_FOUND)
 endif(ZLIB_FOUND)
 
 find_package(PNG)
-if(PNG_FOUND)
+if(PNG_FOUND AND NOT PS2)
 	set(HAVE_LIBPNG 1)
 endif(PNG_FOUND)
 
-if (NOT ENABLE_OSX_BUNDLE)
+if (NOT ENABLE_OSX_BUNDLE AND NOT PS2)
 	find_package(X11)
 	if(X11_FOUND)
 		set(HAVE_X11 1)
@@ -145,22 +150,22 @@ if (NOT ENABLE_OSX_BUNDLE)
 endif()
 
 find_package(PortMidi)
-if(PortMidi_FOUND)
+if(PortMidi_FOUND AND NOT PS2)
 	set(HAVE_PORTMIDI 1)
 endif(PortMidi_FOUND)
 
 find_package(CapsImage)
-if(CapsImage_FOUND)
+if(CapsImage_FOUND AND NOT PS2)
 	set(HAVE_CAPSIMAGE 1)
 endif(CapsImage_FOUND)
 
 find_package(Udev)
-if(Udev_FOUND)
+if(Udev_FOUND AND NOT PS2)
 	set(HAVE_UDEV 1)
 endif(Udev_FOUND)
 
 find_package(Capstone)
-if(Capstone_FOUND)
+if(Capstone_FOUND AND NOT PS2)
 	set(CMAKE_REQUIRED_INCLUDES ${CAPSTONE_INCLUDE_DIR})
 	CHECK_INCLUDE_FILE("m68k.h" HAVE_CAPSTONE_M68K)
 	unset(CMAKE_REQUIRED_INCLUDES)
@@ -182,13 +187,13 @@ check_large_file()
 execute_process(COMMAND getconf LFS_CFLAGS
                 OUTPUT_VARIABLE DETECTED_LFS_CFLAGS
                 ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-if(DETECTED_LFS_CFLAGS)
+if(DETECTED_LFS_CFLAGS AND NOT PS2)
 	add_definitions(${DETECTED_LFS_CFLAGS})
 	# message(STATUS "Large filesystem flags: ${DETECTED_LFS_CFLAGS}")
 endif(DETECTED_LFS_CFLAGS)
 
 # Additional CFLAGS suggested by the SDL library:
-if(PKG_CONFIG_FOUND)
+if(PKG_CONFIG_FOUND AND NOT PS2)
 	execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --cflags-only-other sdl2
 			OUTPUT_VARIABLE SDL2_OTHER_CFLAGS
 			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -307,7 +312,7 @@ if(ENABLE_WERROR)
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
 	else()
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -Wno-error=unused-function")
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=unused-but-set-variable")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -Wno-error=unused-but-set-variable")
 	endif()
 endif(ENABLE_WERROR)
 
@@ -382,7 +387,9 @@ configure_file(${CMAKE_SOURCE_DIR}/cmake/config-cmake.h
 
 add_subdirectory(src)
 add_subdirectory(doc)
-add_subdirectory(tools)
+if(NOT PS2)
+	add_subdirectory(tools)
+endif()
 
 if(NOT CMAKE_CROSSCOMPILING)
 # hatariB -- disabling tests which require the stand-alone executable to be built
@@ -396,7 +403,7 @@ if(Python_Interpreter_FOUND AND Python_VERSION_MAJOR LESS 3)
 	unset(Python_Interpreter_FOUND)
 endif()
 set(PYTHON_GTK_FOUND 0)
-if(Python_Interpreter_FOUND)
+if(Python_Interpreter_FOUND AND NOT PS2)
 	execute_process(COMMAND ${Python_EXECUTABLE} -c "\
 import gi\n\
 gi.require_version('Gtk', '3.0')\n\
@@ -410,9 +417,9 @@ from gi.repository import GLib"
 		set(PYTHON_GTK_FOUND 1)
 		add_subdirectory(python-ui)
 	endif()
-endif(Python_Interpreter_FOUND)
+endif(Python_Interpreter_FOUND AND NOT PS2)
 
-if(UNIX AND NOT ENABLE_OSX_BUNDLE)
+if(UNIX AND NOT ENABLE_OSX_BUNDLE AND NOT PS2)
 	add_subdirectory(share)
 endif()
 
