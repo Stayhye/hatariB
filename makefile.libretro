@@ -89,10 +89,10 @@ else ifeq ($(platform),wii)                     # wii-static
 else ifeq ($(platform),ps2)                     # ps2-static
     CMAKEFLAGS_EXTRA := -DCMAKE_POSITION_INDEPENDENT_CODE=OFF
     CFLAGS_EXTRA := -Os -march=r5900 -mtune=r5900 -G0 -ffast-math -fomit-frame-pointer -DPS2 -DABGR1555 -fno-expensive-optimizations -fcommon
-    MAKE_EXTRA := CC="$(PS2DEV)/ee/bin/mips64r5900el-ps2-elf-gcc" \
-        CXX="$(PS2DEV)/ee/bin/mips64r5900el-ps2-elf-g++" \
-        AR="$(PS2DEV)/ee/bin/mips64r5900el-ps2-elf-ar" \
-        RANLIB="$(PS2DEV)/ee/bin/mips64r5900el-ps2-elf-ranlib" \
+    MAKE_EXTRA := CC="/usr/local/ps2dev/ee/bin/mips64r5900el-ps2-elf-gcc" \
+        CXX="/usr/local/ps2dev/ee/bin/mips64r5900el-ps2-elf-g++" \
+        AR="/usr/local/ps2dev/ee/bin/mips64r5900el-ps2-elf-ar" \
+        RANLIB="/usr/local/ps2dev/ee/bin/mips64r5900el-ps2-elf-ranlib" \
         FPIC_FLAG=""
     MAKE_ACTION := static
     ZLIB_MAKE_ACTION := manual
